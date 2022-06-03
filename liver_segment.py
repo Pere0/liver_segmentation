@@ -89,22 +89,26 @@ def region_grow(im1,seeds):
         i+=1 # Increase the value of the region
     return im_gs
  
-#%% Image segmentation
+# Image segmentation
 
-im = pydicom.dcmread('image.dcm').pixel_array # Get the CT image
-im_segmented=liver_segment(im,0) # Segment the image
+im = pydicom.dcmread('1924.dcm').pixel_array # Get the CT image
+im_segmented=liver_segment(im,1) # Segment the image
 
 plt.figure()
 plt.imshow(im_segmented, cmap='nipy_spectral')
+plt.colorbar()
 
-#%% Comparation to the ground truth
+# Comparation to the ground truth
 
-im_gtm = plt.imread('liver_GT_039.png') # Get the ground truth mask
+im_gtm = plt.imread('liver_GT_024.png') # Get the ground truth mask
 
-index = 4 # Set the index that gets the liver
+index = 8 # Set the index that gets the liver
 
+print('SSIM: ')
 print(ssim(np.float32(im_segmented==index), im_gtm)) # Print the SSIM value of the 2 images
+print('MSE: ')
 print(mse(np.float32(im_segmented==index), im_gtm)) # Print the MSE value of the 2 images
+print('Jaccard Index: ')
 print(jaccard(np.int8(im_gtm.flatten()),im_segmented.flatten()==index)) # Print the Jaccard index of the 2 images
 
 
