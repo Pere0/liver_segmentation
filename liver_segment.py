@@ -1,3 +1,7 @@
+"""
+Liver segmentation using growing region algorithm
+Authors: Pere Pena and Alex Garcia-Duran
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
@@ -10,10 +14,11 @@ from skimage.metrics import mean_squared_error as mse
 from sklearn.metrics import jaccard_score as jaccard
 
 def liver_segment(im,eq):
-    im[im > 3000] = 0
+    im[im > 3000] = 0 # two pixels of each image had values in the order of 10000
+    # so we filtered them
     im = np.array((im/np.max(im))*255, dtype=np.uint8)
     if eq:
-        im=equalization(im)
+        im=equalization(im) # equalize to enhance contrast when needed
 
     # Smoothing and quantization
     # CROPPING IMAGE, threshold=0.035
@@ -28,17 +33,20 @@ def liver_segment(im,eq):
     
 
 def opening(image, kernelSize):
+    # morphological opening
     kernel = np.ones((kernelSize,kernelSize), np.uint8)
     opening = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
     return opening
 
 
 def closing(image, kernelSize):
+    # morphological closing
     kernel = np.ones((kernelSize,kernelSize), np.uint8)
     closing = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
     return closing
 
 def equalization(data):
+    # equalization performed to the input data
     hg = sp.ndimage.histogram(data, 0, 255, 256)
     chg = np.cumsum(hg)
     eqim = np.uint8((255*chg[data])/(data.shape[0]*data.shape[1]))
